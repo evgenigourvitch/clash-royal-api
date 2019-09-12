@@ -21,6 +21,7 @@ func main() {
 	if err != nil {
 		return
 	}
+/*
 	res, err := cr.Request(cr.GetSwaggerUrl()+"clans/%23VGV0RP8/members", objects.EResponseTypePlayersList, 0)
 	if err != nil {
 		fmt.Printf("got error: %+v\n", err)
@@ -28,4 +29,12 @@ func main() {
 	}
 	clanMembers := res.(*objects.PlayersResponse)
 	cr.GetBattles(clanMembers)
+*/
+	res, err := cr.Request(cr.GetSwaggerUrl()+"locations", objects.EResponseTypeLocations, 0)
+	if err != nil {
+		fmt.Printf("got error: %+v\n", err)
+		return
+	}
+	locations := res.(*objects.LocationsResponse)
+	cr.GetClansByLocations(locations)
 }

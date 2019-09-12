@@ -7,6 +7,6 @@ type battleParticipant struct {
 	Crowns                  uint8    `json:"crowns,omitempty"`
 	KingTowerHitPoints      uint16   `json:"kingTowerHitPoints,omitempty"`
 	PrincessTowersHitPoints []uint16 `json:"princessTowersHitPoints,omitempty"`
-	Clan                    *clan    `json:"clan,omitempty"`
+	Clan                    *Clan    `json:"clan,omitempty"`
 	Cards                   []*card  `json:"cards,omitempty"`
 }

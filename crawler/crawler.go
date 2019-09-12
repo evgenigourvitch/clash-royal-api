@@ -15,7 +15,7 @@ import (
 var (
 	cNilResponseErr          = errors.New("nil response")
 	cUndefinedResponseObject = errors.New("got undefined object in response")
-	cMaxNumOfRetries         = 10
+	cMaxNumOfRetries         = 200
 )
 
 type responseChannelObject struct {
@@ -55,6 +55,7 @@ func (c *crawler) Request(url string, responseObjectType objects.ResponseType, r
 	}
 	if res.StatusCode == http.StatusTooManyRequests {
 		if retryCnt <= cMaxNumOfRetries {
+			time.Sleep(1 * time.Second)
 			return c.Request(url, responseObjectType, retryCnt+1)
 		}
 		return nil, fmt.Errorf("failed to fetch url %s after %d retries\n", url, retryCnt)
@@ -89,12 +90,36 @@ func (c *crawler) GetBattles(clanMembers *objects.PlayersResponse) {
 	}
 }
 
+func (c *crawler) GetClansByLocations(locations *objects.LocationsResponse) {
+	requestResultChan := make(chan responseChannelObject, len(locations.Locations))
+	for _, location := range locations.Locations {
+		url := fmt.Sprintf("%sclans/?locationId=%d&minMembers=3&maxMembers=3", c.swaggerUrl, location.ID)
+		go c.RequestAsync(url, objects.EResponseTypeClans, requestResultChan, location)
+	}
+	for i := 0; i < cap(requestResultChan); i++ {
+		select {
+		case requestResult := <-requestResultChan:
+			location := requestResult.obj.(*objects.Location)
+			if requestResult.err != nil {
+				fmt.Printf("failed to get clans for location: %s, error: %+v\n", location.Name, requestResult.err)
+			} else {
+				clans := requestResult.result.(*objects.ClansResponse)
+				clans.Dump(location.Name)
+			}
+		}
+	}
+}
+
 func (c *crawler) parseResponse(bytesArr []byte, responseObjectType objects.ResponseType) (interface{}, error) {
 	switch responseObjectType {
 	case objects.EResponseTypePlayersList:
 		return objects.ParsePlayers(bytesArr)
 	case objects.EResponseTypeBattles:
 		return objects.ParseBattles(bytesArr)
+	case objects.EResponseTypeLocations:
+		return objects.ParseLocations(bytesArr)
+	case objects.EResponseTypeClans:
+		return objects.ParseClans(bytesArr)
 	default:
 		return nil, cUndefinedResponseObject
 	}
