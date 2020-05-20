@@ -7,6 +7,10 @@ import (
 	"github.com/evgenigourvitch/clash-royal-api/objects"
 )
 
+const (
+	clanTag = "%2329VRJ9Q" /* СССР за 30 лет */
+)
+
 func main() {
 	credentials, err := objects.NewCredentials()
 	if err != nil {
@@ -21,15 +25,21 @@ func main() {
 	if err != nil {
 		return
 	}
-/*
-	res, err := cr.Request(cr.GetSwaggerUrl()+"clans/%23VGV0RP8/members", objects.EResponseTypePlayersList, 0)
+//	res, err := cr.Request(cr.GetSwaggerUrl()+"clans/" + clanTag + "/members", objects.EResponseTypePlayersList, 0)
+	res, err := cr.Request(cr.GetSwaggerUrl()+"clans/" + clanTag + "/warlog", objects.EResponseTypeClansWarLog, 0)
 	if err != nil {
 		fmt.Printf("got error: %+v\n", err)
 		return
 	}
-	clanMembers := res.(*objects.PlayersResponse)
-	cr.GetBattles(clanMembers)
-*/
+	wars, ok := res.(*objects.WarsResponse)
+	if !ok {
+		fmt.Printf("failed to cast to *objects.WarsResponse\n")
+		return
+	}
+	fmt.Printf("%+v\n", wars)
+//	cr.GetBattles(clanMembers)
+	/*
+	return
 	res, err := cr.Request(cr.GetSwaggerUrl()+"locations", objects.EResponseTypeLocations, 0)
 	if err != nil {
 		fmt.Printf("got error: %+v\n", err)
@@ -37,4 +47,5 @@ func main() {
 	}
 	locations := res.(*objects.LocationsResponse)
 	cr.GetClansByLocations(locations)
+	*/
 }

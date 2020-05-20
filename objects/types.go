@@ -5,6 +5,7 @@ const (
 	EResponseTypeBattles
 	EResponseTypeLocations
 	EResponseTypeClans
+	EResponseTypeClansWarLog
 )
 
 type ResponseType uint8

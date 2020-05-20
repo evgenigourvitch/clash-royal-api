@@ -120,6 +120,8 @@ func (c *crawler) parseResponse(bytesArr []byte, responseObjectType objects.Resp
 		return objects.ParseLocations(bytesArr)
 	case objects.EResponseTypeClans:
 		return objects.ParseClans(bytesArr)
+	case objects.EResponseTypeClansWarLog:
+		return objects.ParseClanWarLogs(bytesArr)
 	default:
 		return nil, cUndefinedResponseObject
 	}
